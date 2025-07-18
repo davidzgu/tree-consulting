@@ -1,0 +1,17 @@
+research_task:
+  description: >
+    Conduct a thorough research online about the list of companies in the {topic} industry.
+    Make sure you find all the 10-Q and 10-K reports for the past 5 years, and extract 5 key financial metrics from each report.
+  expected_output: >
+    A table with key financial metrics from each companies.
+    A short summary of the findings.
+  agent: financial_researcher
+
+reporting_task:
+  description: >
+    Put the key financial metrics into a concise table, and plot a graph to visualize the trends over the past 5 years.
+    Make sure to include the key financial metrics for each company.
+  expected_output: >
+    A table and a graph showing the key financial metrics for each company.
+    Followed by a short summary of the trends and insights.
+  agent: powerpoint_builder
