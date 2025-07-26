@@ -4,7 +4,7 @@ import warnings
 
 from datetime import datetime
 
-from my_first_agent.crew import MyFirstAgent
+from powerpoint_helper.crew import Powerpoint_Helper
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
@@ -23,7 +23,7 @@ def run():
     }
     
     try:
-        MyFirstAgent().crew().kickoff(inputs=inputs)
+        Powerpoint_Helper().crew().kickoff(inputs=inputs)
     except Exception as e:
         raise Exception(f"An error occurred while running the crew: {e}")
 
@@ -37,7 +37,7 @@ def train():
         'current_year': str(datetime.now().year)
     }
     try:
-        MyFirstAgent().crew().train(n_iterations=int(sys.argv[1]), filename=sys.argv[2], inputs=inputs)
+        Powerpoint_Helper().crew().train(n_iterations=int(sys.argv[1]), filename=sys.argv[2], inputs=inputs)
 
     except Exception as e:
         raise Exception(f"An error occurred while training the crew: {e}")
@@ -47,7 +47,7 @@ def replay():
     Replay the crew execution from a specific task.
     """
     try:
-        MyFirstAgent().crew().replay(task_id=sys.argv[1])
+        Powerpoint_Helper().crew().replay(task_id=sys.argv[1])
 
     except Exception as e:
         raise Exception(f"An error occurred while replaying the crew: {e}")
@@ -62,7 +62,7 @@ def test():
     }
     
     try:
-        MyFirstAgent().crew().test(n_iterations=int(sys.argv[1]), eval_llm=sys.argv[2], inputs=inputs)
+        Powerpoint_Helper().crew().test(n_iterations=int(sys.argv[1]), eval_llm=sys.argv[2], inputs=inputs)
 
     except Exception as e:
         raise Exception(f"An error occurred while testing the crew: {e}")

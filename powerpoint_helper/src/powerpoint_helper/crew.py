@@ -1,7 +1,8 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
-from crewai.tools import SerperDevTool
+from crewai_tools import SerperDevTool, RagTool, FileReadTool
+from crewai.knowledge.source.crew_docling_source import CrewDoclingSource
 from typing import List
 # If you want to run a snippet of code before or after the crew starts,
 # you can use the @before_kickoff and @after_kickoff decorators
@@ -16,7 +17,7 @@ class Powerpoint_Helper():
 
     # Create tools
     search_tool = SerperDevTool()
-    rag_tool = RagTool()
+    #rag_tool = RagTool()
     file_read_tool = FileReadTool()
 
     agents: List[BaseAgent]
@@ -29,15 +30,15 @@ class Powerpoint_Helper():
     # If you would like to add tools to your agents, you can learn more about it here:
     # https://docs.crewai.com/concepts/agents#agent-tools
     @agent
-    def researcher(self) -> Agent:
+    def financial_researcher(self) -> Agent:
         return Agent(
             config=self.agents_config['financial_researcher'], # type: ignore[index]
             verbose=False,
-            tools = [search_tool, rag_tool, file_read_tool]  # Adding tools to the researcher agent
+            tools = [self.search_tool, self.file_read_tool]  # Adding tools to the researcher agent
         )
 
     @agent
-    def analyst(self) -> Agent:
+    def powerpoint_builder(self) -> Agent:
         return Agent(
             config=self.agents_config['powerpoint_builder'], # type: ignore[index]
             verbose=True

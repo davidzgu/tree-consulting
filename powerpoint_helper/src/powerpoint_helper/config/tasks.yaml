@@ -1,7 +1,7 @@
 research_task:
   description: >
     Conduct a thorough research online about the list of companies in the {topic} industry.
-    Make sure you find all the 10-Q and 10-K reports for the past 5 years, and extract 5 key financial metrics from each report.
+    Make sure you find all the 10-Q and 10-K reports for the past 3 years, and extract 5 key financial metrics from each report.
   expected_output: >
     A table with key financial metrics from each companies.
     A short summary of the findings.

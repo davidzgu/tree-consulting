@@ -1,4 +1,4 @@
-researcher:
+financial_researcher:
   role: >
     Financial Reporting Analyst
   goal: >
@@ -12,4 +12,4 @@ powerpoint_builder:
   goal: >
     Create detailed charts based on the financial data and findings provided
   backstory: >
-    You're a meticulous analyst with a keen eye for detail. You're known for your ability to turn complex data into visual graphs, making the audience understand the financial performance of the company at a glance.
+    You're a meticulous analyst with a keen eye for detail. You're known for your ability to turn complex data into visual graphs, making the audience understand the financial performance of the company at a glance
