@@ -1,9 +1,12 @@
+import os
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from crewai_tools import SerperDevTool, RagTool, FileReadTool
 from crewai.knowledge.source.crew_docling_source import CrewDoclingSource
-from typing import List
+#from tools.calculator_tool import calculate #? doesn't read calculator_tool.py
+
+from langchain_openai import ChatOpenAI
 # If you want to run a snippet of code before or after the crew starts,
 # you can use the @before_kickoff and @after_kickoff decorators
 # https://docs.crewai.com/concepts/crews#example-crew-class-with-decorators
@@ -15,14 +18,19 @@ class Powerpoint_Helper():
     #agents_config = "config/agents.yaml" 
     # ?Is this needed?
 
-    # Create tools
-    search_tool = SerperDevTool()
-    #rag_tool = RagTool()
-    file_read_tool = FileReadTool()
+    os.environ["OPENAI_API_KEY"] = "sk-proj-dummy"
+    # Check if the .env executes before the following line
+    llm = ChatOpenAI(
+        model="llama3.2:3b",
+        base_url = "http://localhost:11434/v1",  # Replace with your LLM server URL
+    )
 
-    agents: List[BaseAgent]
-    tasks: List[Task]
+    agents: [BaseAgent] # type: ignore
+    tasks: [Task] # type: ignore
 
+    print ("## What is the company you'd like to analyze?##")
+    search_input = input("Enter the company name: ")
+    
     # Learn more about YAML configuration files here:
     # Agents: https://docs.crewai.com/concepts/agents#yaml-configuration-recommended
     # Tasks: https://docs.crewai.com/concepts/tasks#yaml-configuration-recommended
@@ -31,17 +39,24 @@ class Powerpoint_Helper():
     # https://docs.crewai.com/concepts/agents#agent-tools
     @agent
     def financial_researcher(self) -> Agent:
+        # Create tools
+        search_tool = SerperDevTool()
+        #rag_tool = RagTool()
+        file_read_tool = CrewDoclingSource()
+
         return Agent(
             config=self.agents_config['financial_researcher'], # type: ignore[index]
             verbose=False,
-            tools = [self.search_tool, self.file_read_tool]  # Adding tools to the researcher agent
+            llm = self.llm,
+            tools = [search_tool, file_read_tool]  # Adding tools to the researcher agent
         )
 
     @agent
     def powerpoint_builder(self) -> Agent:
         return Agent(
             config=self.agents_config['powerpoint_builder'], # type: ignore[index]
-            verbose=True
+            verbose=True,
+            llm = self.llm
         )
 
     # To learn more about structured task outputs,
