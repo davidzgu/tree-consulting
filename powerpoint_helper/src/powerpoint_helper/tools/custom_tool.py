@@ -1,4 +1,3 @@
-import os
 from crewai.tools import BaseTool
 from typing import Type
 from pydantic import BaseModel, Field
@@ -17,6 +16,5 @@ class MyCustomTool(BaseTool):
 
     def _run(self, argument: str) -> str:
         # Implementation goes here
-        print ("## What is the company you'd like to analyze?##")
-        search_input = input("Enter the company name: ")
+
         return "this is an example of a tool output, ignore it and move along."

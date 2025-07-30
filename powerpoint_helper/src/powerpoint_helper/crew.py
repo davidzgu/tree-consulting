@@ -1,5 +1,5 @@
 import os
-from crewai import Agent, Crew, Process, Task
+from crewai import Agent, Crew, Process, Task, LLM
 from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from crewai_tools import SerperDevTool, RagTool, FileReadTool
@@ -18,12 +18,9 @@ class Powerpoint_Helper():
     #agents_config = "config/agents.yaml" 
     # ?Is this needed?
 
-    os.environ["OPENAI_API_KEY"] = "sk-proj-dummy"
+    #os.environ["OPENAI_API_KEY"] = "sk-proj-dummy"
     # Check if the .env executes before the following line
-    llm = ChatOpenAI(
-        model="llama3.2:3b",
-        base_url = "http://localhost:11434/v1",  # Replace with your LLM server URL
-    )
+    llm=LLM(model="ollama/llama3.2:3b", base_url="http://localhost:11434")
 
     agents: [BaseAgent] # type: ignore
     tasks: [Task] # type: ignore
@@ -42,13 +39,15 @@ class Powerpoint_Helper():
         # Create tools
         search_tool = SerperDevTool()
         #rag_tool = RagTool()
-        file_read_tool = CrewDoclingSource()
+        """ file_read_tool = CrewDoclingSource(
+            file_paths = [file_path]
+        ) """
 
         return Agent(
             config=self.agents_config['financial_researcher'], # type: ignore[index]
             verbose=False,
             llm = self.llm,
-            tools = [search_tool, file_read_tool]  # Adding tools to the researcher agent
+            tools = [search_tool]  # Adding tools to the researcher agent
         )
 
     @agent

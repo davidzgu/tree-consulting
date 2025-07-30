@@ -15,10 +15,3 @@ reporting_task:
     A table and a graph showing the key financial metrics for each company.
     Followed by a short summary of the trends and insights.
   agent: powerpoint_builder
-
-math_task:
-  description: >
-    {math_input}
-  expected_output: >
-    Give the result of the math operation and provide rationale for the answer.
-  agent: math_agent
