@@ -1,0 +1,1 @@
+Action: { "argument": {"description": "Description of the argument.", "type": "str"}, "Read PDF Links": "{}" }

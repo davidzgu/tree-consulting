@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#import
 import sys
 import warnings
 
@@ -17,9 +18,11 @@ def run():
     """
     Run the crew.
     """
+    print ("## What is the company you'd like to analyze?##")
+
     inputs = {
-        'topic': 'Financial Service',
-        'current_year': str(datetime.now().year)
+        'topic': 'official 10-Q and 10-K financial reports',
+        'company_name': input("Enter the company name: ")
     }
     
     try:

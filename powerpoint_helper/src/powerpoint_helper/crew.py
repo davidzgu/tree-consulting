@@ -1,9 +1,11 @@
 import os
 from crewai import Agent, Crew, Process, Task, LLM
 from crewai.project import CrewBase, agent, crew, task
+#from composio_crewai import ComposioToolSet, App, Action
 from crewai.agents.agent_builder.base_agent import BaseAgent
-from crewai_tools import SerperDevTool, RagTool, FileReadTool
+from crewai_tools import SerperDevTool, RagTool, FileReadTool, FileWriterTool
 from crewai.knowledge.source.crew_docling_source import CrewDoclingSource
+import src.powerpoint_helper.tools.custom_tool as custom_tool
 #from tools.calculator_tool import calculate #? doesn't read calculator_tool.py
 
 from langchain_openai import ChatOpenAI
@@ -18,15 +20,11 @@ class Powerpoint_Helper():
     #agents_config = "config/agents.yaml" 
     # ?Is this needed?
 
-    #os.environ["OPENAI_API_KEY"] = "sk-proj-dummy"
     # Check if the .env executes before the following line
     llm=LLM(model="ollama/llama3.2:3b", base_url="http://localhost:11434")
 
     agents: [BaseAgent] # type: ignore
     tasks: [Task] # type: ignore
-
-    print ("## What is the company you'd like to analyze?##")
-    search_input = input("Enter the company name: ")
     
     # Learn more about YAML configuration files here:
     # Agents: https://docs.crewai.com/concepts/agents#yaml-configuration-recommended
@@ -35,25 +33,34 @@ class Powerpoint_Helper():
     # If you would like to add tools to your agents, you can learn more about it here:
     # https://docs.crewai.com/concepts/agents#agent-tools
     @agent
-    def financial_researcher(self) -> Agent:
+    def scrapper(self) -> Agent:
         # Create tools
         search_tool = SerperDevTool()
-        #rag_tool = RagTool()
-        """ file_read_tool = CrewDoclingSource(
-            file_paths = [file_path]
-        ) """
+        file_writer_tool = FileWriterTool(filename = "WEB_RESULT.txt")
 
         return Agent(
-            config=self.agents_config['financial_researcher'], # type: ignore[index]
-            verbose=False,
+            config=self.agents_config['scrapper'], # type: ignore[index]
+            verbose=True,
             llm = self.llm,
-            tools = [search_tool]  # Adding tools to the researcher agent
+            tools = [search_tool, file_writer_tool]  # Adding tools to the researcher agent
         )
 
     @agent
-    def powerpoint_builder(self) -> Agent:
+    def researcher(self) -> Agent:
+        researcher_tool = custom_tool.MyCustomTool()  # Using the custom tool defined above
+
         return Agent(
-            config=self.agents_config['powerpoint_builder'], # type: ignore[index]
+            config=self.agents_config['researcher'], # type: ignore[index]
+            verbose=False,
+            llm = self.llm,
+            tools = [researcher_tool]  # Adding tools to the researcher agent
+        ) #researcher agent does not have a tool.
+
+    @agent
+    def builder(self) -> Agent:
+        #Pending addition of PPT tool
+        return Agent(
+            config=self.agents_config['builder'], # type: ignore[index]
             verbose=True,
             llm = self.llm
         )
@@ -62,18 +69,32 @@ class Powerpoint_Helper():
     # task dependencies, and task callbacks, check out the documentation:
     # https://docs.crewai.com/concepts/tasks#overview-of-a-task
     @task
-    def query_data(self) -> Task:
+    def scrapping_task(self) -> Task:
         return Task(
-            config=self.tasks_config['research_task'], # type: ignore[index]
+            config=self.tasks_config['scrapping_task'], # type: ignore[index]
+            output_file='scrapper_output.md'  # Output file to save the scraped data
         )
+    #?Conditional Task
+    @task
+    def researching_task(self) -> Task:
+        return Task(
+            config=self.tasks_config['researching_task'], # type: ignore[index]
+            output_file='resarcher_output.md'
+        )
+    
+        """         return ConditionalTask(
+            config=self.tasks_config['researching_task'], # type: ignore[index]
+            output_file='resarcher_output.md',
+            condition = web_result_exists
+        ) """
 
     @task
-    def plot_graph(self) -> Task:
+    def building_task(self) -> Task:
         return Task(
-            config=self.tasks_config['reporting_task'], # type: ignore[index]
-            output_file='report.md'
+            config=self.tasks_config['building_task'], # type: ignore[index]
+            output_file='builder_output.md'
         )
-
+    
     @crew
     def crew(self) -> Crew:
         """Creates the Powerpoint_Helper crew"""
