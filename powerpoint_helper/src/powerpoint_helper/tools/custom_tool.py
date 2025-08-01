@@ -9,7 +9,7 @@ class MyCustomToolInput(BaseModel):
     """Input schema for MyCustomTool."""
     argument: str = Field(..., description="Description of the argument.")
 
-class MyCustomTool(BaseTool):
+class PDF_Reader_Tool(BaseTool):
     name: str = "Read PDF Links"
     description: str = (
         "Read PDF Links from a text file"

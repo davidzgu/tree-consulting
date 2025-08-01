@@ -1,1 +1,2 @@
-Action: { "argument": {"description": "Description of the argument.", "type": "str"}, "Read PDF Links": "{}" }
+Thought: As a Financial Reporting Analyst, my goal is to identify key performance indicators (KPIs) in the official 10-Q and 10-K financial reports that impact the performance of the company. I need to search through these reports for relevant information.
+Action: { "query": {"description": "Identify KPIs in 10-Q and 10-K reports"}, "pdf": {"description": "Path to the official 10-Q and 10-K financial reports"}}

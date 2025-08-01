@@ -1,9 +1,9 @@
 import os
 from crewai import Agent, Crew, Process, Task, LLM
-from crewai.project import CrewBase, agent, crew, task
+from crewai.project import CrewBase, agent, crew, task, before_kickoff, after_kickoff
 #from composio_crewai import ComposioToolSet, App, Action
 from crewai.agents.agent_builder.base_agent import BaseAgent
-from crewai_tools import SerperDevTool, RagTool, FileReadTool, FileWriterTool
+from crewai_tools import SerperDevTool, RagTool, FileReadTool, FileWriterTool, PDFSearchTool
 from crewai.knowledge.source.crew_docling_source import CrewDoclingSource
 import src.powerpoint_helper.tools.custom_tool as custom_tool
 #from tools.calculator_tool import calculate #? doesn't read calculator_tool.py
@@ -26,6 +26,23 @@ class Powerpoint_Helper():
     agents: [BaseAgent] # type: ignore
     tasks: [Task] # type: ignore
     
+    # @before_kickoff
+    # def prepare_inputs(self, inputs):
+    #     # Modify inputs before the crew starts
+    #     inputs['additional_data'] = "Some extra information"
+    #     return inputs
+
+    # @after_kickoff
+    # def process_output(self, output):
+    #     # Modify output after the crew finishes
+    #     output.raw += "\nProcessed after kickoff."
+    #     return output
+    
+    # Create tools
+    search_tool = SerperDevTool()
+    researcher_tool = PDFSearchTool()
+    file_writer_tool = FileWriterTool()
+
     # Learn more about YAML configuration files here:
     # Agents: https://docs.crewai.com/concepts/agents#yaml-configuration-recommended
     # Tasks: https://docs.crewai.com/concepts/tasks#yaml-configuration-recommended
@@ -34,35 +51,35 @@ class Powerpoint_Helper():
     # https://docs.crewai.com/concepts/agents#agent-tools
     @agent
     def scrapper(self) -> Agent:
-        # Create tools
-        search_tool = SerperDevTool()
-        file_writer_tool = FileWriterTool(filename = "WEB_RESULT.txt")
+
+        #file_writer_tool = FileWriterTool(filename = "WEB_RESULT.txt")
 
         return Agent(
             config=self.agents_config['scrapper'], # type: ignore[index]
             verbose=True,
             llm = self.llm,
-            tools = [search_tool, file_writer_tool]  # Adding tools to the researcher agent
+            tools = [self.search_tool]  # Adding tools to the researcher agent
         )
 
     @agent
     def researcher(self) -> Agent:
-        researcher_tool = custom_tool.MyCustomTool()  # Using the custom tool defined above
 
         return Agent(
             config=self.agents_config['researcher'], # type: ignore[index]
             verbose=False,
             llm = self.llm,
-            tools = [researcher_tool]  # Adding tools to the researcher agent
+            tools = [self.researcher_tool]  # Adding tools to the researcher agent
         ) #researcher agent does not have a tool.
 
     @agent
     def builder(self) -> Agent:
         #Pending addition of PPT tool
+        
         return Agent(
             config=self.agents_config['builder'], # type: ignore[index]
             verbose=True,
-            llm = self.llm
+            llm = self.llm,
+            tools = [self.file_writer_tool]
         )
 
     # To learn more about structured task outputs,
@@ -70,6 +87,7 @@ class Powerpoint_Helper():
     # https://docs.crewai.com/concepts/tasks#overview-of-a-task
     @task
     def scrapping_task(self) -> Task:
+
         return Task(
             config=self.tasks_config['scrapping_task'], # type: ignore[index]
             output_file='scrapper_output.md'  # Output file to save the scraped data
@@ -77,6 +95,7 @@ class Powerpoint_Helper():
     #?Conditional Task
     @task
     def researching_task(self) -> Task:
+
         return Task(
             config=self.tasks_config['researching_task'], # type: ignore[index]
             output_file='resarcher_output.md'
@@ -100,11 +119,21 @@ class Powerpoint_Helper():
         """Creates the Powerpoint_Helper crew"""
         # To learn how to add knowledge sources to your crew, check out the documentation:
         # https://docs.crewai.com/concepts/knowledge#what-is-knowledge
+        
+        # Set custom storage location
 
         return Crew(
             agents=self.agents, # Automatically created by the @agent decorator
             tasks=self.tasks, # Automatically created by the @task decorator
             process=Process.sequential,
+            memory=True,  # Enable memory to store task outputs
+            embedder={
+                "provider": "ollama",
+                "config": {
+                    "model": "mxbai-embed-large",  # or "nomic-embed-text"
+                    "url": "http://localhost:11434/api/embeddings"  # Default Ollama URL
+                }
+            },
             verbose=True,
             # process=Process.hierarchical, # In case you wanna use that instead https://docs.crewai.com/how-to/Hierarchical/
         )

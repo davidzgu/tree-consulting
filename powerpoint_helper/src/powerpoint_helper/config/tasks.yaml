@@ -1,9 +1,9 @@
 scrapping_task:
   description: >
-    Conduct a thorough research online about the list of companies relevant to {company_name}.
+    Conduct a thorough research online about the peer companies to {company_name} in the same industry.
     Make sure you find all the {topic} for the past 3 years.
   expected_output: >
-    A list of links to PDF for the {topic} of each company that're saved locally.
+    A list of links to PDF for the {topic} of each company that're saved in memory.
   agent: scrapper
 
 researching_task:
